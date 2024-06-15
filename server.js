@@ -17,13 +17,13 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    console.log("a user connected", socket.id);
+    // console.log("a user connected", socket.id);
 
     // Handle user identification, for example through a login event
     socket.on("login", (userId) => {
-      connectedUsers.push({ socketId: socket.id, userId: userId });
-      console.log("User logged in: ", userId);
-      console.log("Connected users: ", connectedUsers);
+      connectedUsers.push({ socketId: socket.id, userId: userId, rooms: [] });
+      // console.log("User logged in: ", userId);
+      // console.log("Connected users: ", connectedUsers);
     });
 
     // Handle user disconnection
@@ -32,18 +32,28 @@ app.prepare().then(() => {
       connectedUsers = connectedUsers.filter(
         (user) => user.socketId !== socket.id
       );
-      console.log("Connected users: ", connectedUsers);
+      // console.log("Connected users: ", connectedUsers);
     });
 
-    socket.on("message", (userId) => {
-      console.log(
-        "the user" + userId + "whith socket id" + socket.id + "send a message"
-      );
+    socket.on("joinRoom", (room) => {
+      // console.log("ERE", room);
+      socket.join(room);
+
+      // user.rooms.push(room);
+      // console.log(`User ${user.userId} joined room: ${room}`);
+    });
+
+    socket.on("message", (data) => {
+      const { roomId, message } = data;
+
+      // console.log("AWA", roomId, message);
+
+      socket.to(roomId).emit("message", message);
     });
   });
 
   httpServer.once("error", (err) => {
-    console.error(err);
+    // console.error(err);
     process.exit(1);
   });
 
