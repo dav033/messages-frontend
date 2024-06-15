@@ -16,12 +16,13 @@ interface Props {
 
 export default function RoomItem(props: Props) {
   const { id, type_room, name } = props;
+  const { user } = useUser();
 
-  // const isTheUserInRoom = () => {
-  //   if (user) {
-  //     return props.users.includes(user.id);
-  //   }
-  // };
+  const isTheUserInRoom = () => {
+    if (user) {
+      return props.users.includes(user.id);
+    }
+  };
 
   return (
     <div className="mb-6 bg-gray-900 p-4 rounded flex items-center ">
