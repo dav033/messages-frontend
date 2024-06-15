@@ -36,7 +36,7 @@ export default function RoomItem(props: Props) {
         <span className="text-sm text-gray-400">10 members, 5 online</span>
       </div>
 
-      {/* {!isTheUserInRoom() && (
+      {!isTheUserInRoom() && (
         <Button
           onClick={() => joinRoom(id, user.id)}
           className="ml-auto"
@@ -45,7 +45,7 @@ export default function RoomItem(props: Props) {
         >
           Join
         </Button>
-      )} */}
+      )}
     </div>
   );
 }
