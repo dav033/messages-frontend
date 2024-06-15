@@ -16,7 +16,6 @@ export async function getData(id) {
 }
 
 export async function sendMessage(message) {
-  console.log(message);
   const res = await fetch(`http://localhost:8082/messages`, {
     method: "POST",
     body: JSON.stringify(message),
@@ -25,11 +24,25 @@ export async function sendMessage(message) {
     },
   });
 
-  console.log(res);
+  return res.json();
+}
+
+export async function getMessagesByChat(chat) {
+  const res = await fetch(`http://localhost:8082/messages/${chat}`, {
+    method: "GET",
+    next: { tags: ["messages"] },
+    cache: "no-cache",
+  });
 
   return res.json();
 }
 
-export async function obtenerItem(id) {
-  return id;
+export async function getRooms() {
+  const res = await fetch("http://localhost:8080/rooms", {
+    method: "GET",
+    next: { tags: ["rooms"] },
+    cache: "force-cache",
+  });
+
+  return res.json();
 }
