@@ -1,26 +1,20 @@
-"use client";
-import { useUser } from "@/providers/UserContext";
+"use server";
 import DropdownActionList from "../DropdownActionList";
 import Actions from "./Actions";
 import Chats from "./Chats";
 import Friends from "./Friends";
-import { useEffect, useState, useTransition } from "react";
 import { getData } from "@/app/actions";
+import { cookies } from "next/headers";
 
-export default function Sidebar() {
-  const { user } = useUser();
+export default async function Sidebar() {
+  const cookieStore = cookies();
+  const userId = cookieStore.get("userId");
 
-  const [chats, setChats] = useState([]);
+  let data = [];
+  if (userId) {
+    data = await getData(userId.value);
+  }
 
-  useEffect(() => {
-    async function fetchChats() {
-      if (user) {
-        const response = await getData(user.id);
-        setChats(response);
-      }
-    }
-    fetchChats();
-  }, [user]);
   return (
     <div className="bg-gray-900 w-[350px] h-[100vh] text-white px-3">
       <h1 className="font-bold px-3 py-7">Chat App</h1>
@@ -32,7 +26,7 @@ export default function Sidebar() {
       </DropdownActionList>
 
       <DropdownActionList title="Chats">
-        <Chats chats={chats} />
+        <Chats chats={data} />
       </DropdownActionList>
     </div>
   );
