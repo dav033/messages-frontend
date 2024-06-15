@@ -1,21 +1,48 @@
 "use client";
 
 import { Send } from "@/icons/Send.icon";
-import { sendMessage } from "@/app/actions";
+import { revalidate, sendMessage } from "@/app/actions";
 import Button from "../Button";
 import { useUser } from "@/providers/UserContext";
 import { socket } from "@/socket";
+import { useEffect } from "react";
 
 export default function MessageArea(props) {
-  const { roomId } = props;
+  const { roomId, handleMessages, updateMessageId } = props;
   const { user } = useUser();
+
+  useEffect(() => {
+    socket.on("message", (data) => {
+      if (data.receiver !== roomId) {
+        return;
+      } else {
+        handleMessages(data);
+      }
+    });
+
+    // socket.emit("joinRoom", roomId);
+
+    return () => {
+      socket.off("message");
+    };
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const message = e.target[0].value.trim();
     if (!message) return;
+    e.target[0].value = "";
 
-    console.log(message, user.id, roomId);
+    const tempId = `temp-${Date.now()}`;
+    const msg = {
+      id: tempId, // ID temporal
+      body: message,
+      typeM: "text",
+      sender: user.id.toString(),
+      receiver: roomId,
+    };
+
+    handleMessages(msg);
 
     const response = await sendMessage({
       body: message,
@@ -24,9 +51,14 @@ export default function MessageArea(props) {
       receiver: roomId,
     });
 
-    socket.emit("message", user.id)
+    if (response?.id) {
+      updateMessageId(tempId, response.id);
+    }
 
-    console.log(response);
+    socket.emit("message", {
+      roomId: roomId,
+      message: { ...msg, id: response?.id || tempId },
+    });
   };
 
   return (
