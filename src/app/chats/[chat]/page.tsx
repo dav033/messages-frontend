@@ -1,17 +1,14 @@
-import MessageArea from "@/components/chat/MessageArea";
-import { useEffect } from "react";
+import Messages from "@/components/chat/Messages";
+import { getMessagesByChat } from "@/app/actions";
 
-export default function Chat({ params }) {
-  console.log(params);
+export default async function Chat({ params }) {
+  const data = await getMessagesByChat(params.chat);
+
+  console.log(data.length);
 
   return (
     <div className="bg-gray-950 flex flex-col h-screen">
-      <div className="flex-1">
-        message1 message 2 sdasdisamdsomsdmi
-        {params.chat}
-      </div>
-
-      <MessageArea roomId={params.chat} />
+      <Messages messagesData={data} chat={params.chat} />
     </div>
   );
 }
