@@ -1,20 +1,20 @@
 "use client";
 
-
+import { revalidate } from "@/app/actions";
 import { Chat } from "@/icons/Chat.icon";
+import { socket } from "@/socket";
 import Link from "next/link";
 import { useEffect } from "react";
 
 export default function ChatItem({ chat }: any) {
   const { id } = chat;
 
-  // useEffect(() => {
-  //   console.log("joining room");
-  //   const room = "chat-" + id;
-  //   socket.emit("joinRoom", room);
-  // }, []);
   return (
     <Link
+      onClick={() => {
+        revalidate("messages")
+      }}
+      prefetch={false}
       href={`/chats/${chat.id}`}
       className="flex items-center p-3 hover:bg-gray-800 cursor-pointer w-full rounded"
     >
