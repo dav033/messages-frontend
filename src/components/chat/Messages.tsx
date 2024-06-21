@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import MessageArea from "@/components/chat/MessageArea";
+import { revalidate } from "@/app/actions";
 
 export default function Messages(props) {
   const { messagesData, chat } = props;
@@ -19,6 +20,13 @@ export default function Messages(props) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+
+    revalidate(`messages-${chat}`);
+
+    
+  }, [chat]);
 
   const handleMessages = (msg) => {
     setMessages((prevMessages) => [...prevMessages, msg]);

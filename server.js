@@ -6,7 +6,7 @@ const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
 const port = 3000;
 
-const app = next({ dev });
+const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
 let connectedUsers = []; // Array to store connected users
@@ -58,6 +58,6 @@ app.prepare().then(() => {
   });
 
   httpServer.listen(port, hostname, () => {
-    console.log(`> Ready on http://${hostname}:${port}`);
+    console.log(`> Ready on http://${hostname}:${port}  ${dev ? "dev" : ""}`);
   });
 });

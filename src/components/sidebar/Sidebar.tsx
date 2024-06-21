@@ -3,7 +3,7 @@ import DropdownActionList from "../DropdownActionList";
 import Actions from "./Actions";
 import Chats from "./Chats";
 import Friends from "./Friends";
-import { getData } from "@/app/actions";
+import { getData, getLastMessage, getUnreadMessages, getUserById } from "@/app/actions";
 import { cookies } from "next/headers";
 
 export default async function Sidebar() {
@@ -11,8 +11,11 @@ export default async function Sidebar() {
   const userId = cookieStore.get("userId");
 
   let data = [];
+  let user = null;
+
   if (userId) {
     data = await getData(userId.value);
+    user = await getUserById(userId.value);
   }
 
   return (
@@ -26,7 +29,7 @@ export default async function Sidebar() {
       </DropdownActionList>
 
       <DropdownActionList title="Chats">
-        <Chats chats={data} />
+        <Chats chats={data} user = {user} />
       </DropdownActionList>
     </div>
   );

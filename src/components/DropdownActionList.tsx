@@ -7,7 +7,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-export default function DropdownActionList(props: Props) {
+const DropdownActionList: React.FC<Props> = React.memo(function DropdownActionList(props: Props) {
   const { title, children } = props;
   const [open, setOpen] = useState(true);
   const handleToggle = () => {
@@ -17,7 +17,7 @@ export default function DropdownActionList(props: Props) {
   return (
     <div>
       <div
-        className="flex items-center justify-between px-1 py-2 cursor-pointer  text-white   hover:bg-gray-800 "
+        className="flex items-center justify-between px-1 py-2 cursor-pointer text-white hover:bg-gray-800"
         onClick={handleToggle}
       >
         <span className="text-sm">
@@ -32,7 +32,7 @@ export default function DropdownActionList(props: Props) {
       </div>
 
       <div
-        className={`relative  transition-all duration-300 ${
+        className={`relative transition-all duration-300 ${
           open ? "h-44 overflow-auto" : "h-0 overflow-hidden"
         }`}
       >
@@ -40,4 +40,6 @@ export default function DropdownActionList(props: Props) {
       </div>
     </div>
   );
-}
+});
+
+export default DropdownActionList;

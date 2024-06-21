@@ -44,7 +44,6 @@ export async function getRooms() {
   const res = await fetch("http://localhost:8080/rooms", {
     method: "GET",
     next: { tags: ["rooms"] },
-    cache: "force-cache",
   });
 
   return res.json();
