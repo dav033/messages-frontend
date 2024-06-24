@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { UserContextProvider, useUser } from "@/providers/UserContext";
-import SidebarServer from "@/components/sidebar/SidebarServer.jsx";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -24,7 +23,7 @@ export default async function RootLayout({
             <Sidebar />
 
             <div
-              className={`flex flex-col flex-grow w-screen md:w-full min-h-screen overflow-visible ${inter.className}`}
+              className={`flex flex-col flex-grow w-screen md:w-full min-h-screen overflow-visible ${inter.className} bg-transparent`}
             >
               {children}
             </div>

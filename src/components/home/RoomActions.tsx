@@ -27,7 +27,8 @@ export default function RoomActions() {
         type_room: "public",
       });
 
-      // revalidate("rooms");
+      revalidate("rooms");
+      revalidate("chats")
 
       close();
     } catch (err) {

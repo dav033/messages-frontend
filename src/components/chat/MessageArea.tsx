@@ -1,7 +1,7 @@
 "use client";
 
 import { Send } from "@/icons/Send.icon";
-import { revalidate, sendMessage } from "@/app/actions";
+import { sendMessage } from "../../petitions";
 import Button from "../Button";
 import { useUser } from "@/providers/UserContext";
 import { socket } from "@/socket";
@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 export default function MessageArea(props) {
   const { roomId, handleMessages, updateMessageId } = props;
-  const { user } = useUser();
+  const { user, handleChats } = useUser();
 
   useEffect(() => {
     socket.on("message", (data) => {
@@ -54,6 +54,8 @@ export default function MessageArea(props) {
     if (response?.id) {
       updateMessageId(tempId, response.id);
     }
+
+    handleChats(msg)
 
     socket.emit("message", {
       roomId: roomId,

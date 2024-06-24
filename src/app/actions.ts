@@ -6,44 +6,11 @@ export async function revalidate(tag: string) {
   revalidateTag(tag);
 }
 
-export async function getData(roomId) {
-  const res = await fetch(`http://localhost:8080/user_rooms/${roomId}`, {
-    method: "GET",
-    next: { tags: ["chats"] },
-  });
-
-  return res.json();
-}
-
-export async function getUserById(userId) {
-  const res = await fetch(
-    `http://localhost:4000/users/getUserByID?id=${userId}`,
-    {
-      method: "GET",
-      next: { tags: ["user"] },
-      cache: "no-cache",
-    }
-  );
-
-  return res.json();
-}
-
-export async function sendMessage(message) {
-  const res = await fetch(`http://localhost:8082/messages`, {
-    method: "POST",
-    body: JSON.stringify(message),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  return res.json();
-}
-
 export async function getRooms() {
   const res = await fetch("http://localhost:8080/rooms", {
     method: "GET",
     next: { tags: ["rooms"] },
+    cache: "no-cache",
   });
 
   return res.json();

@@ -16,6 +16,27 @@ const joinRoom = async (room_id, user_id) => {
   }
 };
 
+async function getUserById(userId) {
+  const res = await fetch(
+    `http://localhost:4000/users/getUserByID?id=${userId}`,
+    {
+      method: "GET",
+      next: { tags: ["user"] },
+    }
+  );
+
+  return res.json();
+}
+
+async function getData(roomId) {
+  const res = await fetch(`http://localhost:8080/user_rooms/${roomId}`, {
+    method: "GET",
+    next: { tags: ["chats"] },
+  });
+
+  return res.json();
+}
+
 const getMessagesByChat = async (chat) => {
   const inicio = performance.now();
 
@@ -31,4 +52,16 @@ const getMessagesByChat = async (chat) => {
   return res.json();
 };
 
-export { joinRoom, getMessagesByChat };
+async function sendMessage(message) {
+  const res = await fetch(`http://localhost:8082/messages`, {
+    method: "POST",
+    body: JSON.stringify(message),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return res.json();
+}
+
+export { joinRoom, getUserById, getData, getMessagesByChat, sendMessage };

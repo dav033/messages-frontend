@@ -1,21 +1,21 @@
-"use server";
 import DropdownActionList from "../DropdownActionList";
 import Actions from "./Actions";
 import Chats from "./Chats";
 import Friends from "./Friends";
-import { getData, getLastMessage, getUnreadMessages, getUserById } from "@/app/actions";
+import { getUserById } from "../../petitions";
+import { Suspense } from "react";
 import { cookies } from "next/headers";
+import { getData } from "../../petitions";
 
 export default async function Sidebar() {
   const cookieStore = cookies();
   const userId = cookieStore.get("userId");
 
-  let data = [];
-  let user = null;
-
+  let user_res = null;
+  let data_res = [];
   if (userId) {
-    data = await getData(userId.value);
-    user = await getUserById(userId.value);
+    user_res = await getUserById(userId.value);
+    data_res = await getData(userId.value);
   }
 
   return (
@@ -29,7 +29,9 @@ export default async function Sidebar() {
       </DropdownActionList>
 
       <DropdownActionList title="Chats">
-        <Chats chats={data} user = {user} />
+        <Suspense fallback={<div>huw</div>}>
+          <Chats chatsData={data_res} user={user_res} />
+        </Suspense>
       </DropdownActionList>
     </div>
   );

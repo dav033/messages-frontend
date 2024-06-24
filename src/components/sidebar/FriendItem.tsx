@@ -13,7 +13,7 @@ export default function FriendItem() {
         />
       </div>
 
-      <div className="bg-red- h-9 flex-col justify-center p-1">
+      <div className="h-9 flex-col justify-center p-1">
         <h4 className="text-xs bg-blue- leading-none mb-1">Jared Palmer</h4>
         <h5 className="text-xs text-gray-400 bg-purple- leading-none">
           Online

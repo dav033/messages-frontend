@@ -12,73 +12,92 @@ export function UserContextProvider({
   children: React.ReactNode;
 }) {
   const [user, setUser] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [lastMessages, setLastMessages] = useState([]);
+
+  const handleChats = (message) => {
+    setLastMessages((prevData) => {
+      const newMessages = [...prevData];
+      const existingMessageIndex = newMessages.findIndex(
+        (msg) => msg.receiver === message.receiver
+      );
+
+      if (existingMessageIndex !== -1) {
+        newMessages.splice(existingMessageIndex, 1);
+      }
+
+      newMessages.unshift(message);
+
+      return newMessages;
+    });
+  };
 
   useEffect(() => {
-    const storedUserData = localStorage.getItem("userData");
-    const userIdFromCookie = getCookie("userId");
+    const fetchUserData = async (userId) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:4000/users/${userId}`
+        );
+        const userData = response.data;
+        setUser(userData);
+        setCookie("userId", userData.id, 7);
+        localStorage.setItem("userData", JSON.stringify(userData));
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-    if (storedUserData) {
-      setUser(JSON.parse(storedUserData));
-      setCookie("userId", JSON.parse(storedUserData).id, 7); // Almacena la cookie por 7 días
-    } else if (userIdFromCookie) {
-      const fetchUserData = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:4000/users/${userIdFromCookie}`
-          );
+    const registerTemporalUser = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:4000/users/register_temporal"
+        );
+        const userData = response.data;
+        setUser(userData);
+        setCookie("userId", userData.id, 7);
+        localStorage.setItem("userData", JSON.stringify(userData));
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-          const userData = response.data;
-          setUser(userData);
-          setCookie("userId", userData, 7); // Almacena la cookie por 7 días
+    const initUser = async () => {
+      const inicio = performance.now();
+      const storedUserData = localStorage.getItem("userData");
+      const userIdFromCookie = getCookie("userId");
 
-          localStorage.setItem("userData", JSON.stringify(userData));
-        } catch (error) {
-          console.error(error);
-        }
-      };
+      if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        setUser(userData);
+        setCookie("userId", userData.id, 7);
 
-      fetchUserData();
-    } else {
-      const registerTemporalUser = async () => {
-        try {
-          const response = await axios.post(
-            "http://localhost:4000/users/register_temporal"
-          );
+        const tiempoTranscurrido = performance.now() - inicio;
+        console.log("Tiempo transcurrido: " + tiempoTranscurrido / 1000);
+      } else if (userIdFromCookie) {
+        await fetchUserData(userIdFromCookie);
+      } else {
+        await registerTemporalUser();
+      }
+    };
 
-          const userData = response.data;
-          setUser(userData);
-          localStorage.setItem("userData", JSON.stringify(userData));
-          setCookie("userId", userData.id, 7); // Almacena la cookie por 7 días
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-      registerTemporalUser();
-    }
+    initUser();
   }, []);
 
   useEffect(() => {
     if (user) {
       socket.emit("login", user.id);
-    }
 
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-    };
+      socket.on("message", (data) => {
+        const roomId = data.receiver;
+      });
+
+      return () => {
+        socket.off("message");
+      };
+    }
   }, [user]);
 
-  useEffect(() => {
-    socket.on("message", (data) => {
-      const roomId = data.receiver;
-      
-    });
-  });
-
   return (
-    <userContext.Provider value={{ user, setUser }}>
+    <userContext.Provider value={{ user, setUser, lastMessages, handleChats }}>
       {children}
     </userContext.Provider>
   );
