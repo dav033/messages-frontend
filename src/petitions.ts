@@ -64,4 +64,15 @@ async function sendMessage(message) {
   return res.json();
 }
 
+async function setReadedMessages(roomId, userId) {
+  const res = await fetch(
+    `http://localhost:8080/set_readed_messages/${roomId}/${userId}`,
+    {
+      method: "PUT",
+    }
+  );
+
+  return res.json();
+}
+
 export { joinRoom, getUserById, getData, getMessagesByChat, sendMessage };

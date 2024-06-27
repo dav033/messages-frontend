@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 export default function MessageArea(props) {
   const { roomId, handleMessages, updateMessageId } = props;
-  const { user, handleChats } = useUser();
+  const { user, handleChats, handleUnreadedMessages } = useUser();
 
   useEffect(() => {
     socket.on("message", (data) => {
@@ -19,8 +19,6 @@ export default function MessageArea(props) {
         handleMessages(data);
       }
     });
-
-    // socket.emit("joinRoom", roomId);
 
     return () => {
       socket.off("message");
@@ -35,7 +33,7 @@ export default function MessageArea(props) {
 
     const tempId = `temp-${Date.now()}`;
     const msg = {
-      id: tempId, // ID temporal
+      id: tempId,
       body: message,
       typeM: "text",
       sender: user.id.toString(),
@@ -43,6 +41,7 @@ export default function MessageArea(props) {
     };
 
     handleMessages(msg);
+    handleChats(msg);
 
     const response = await sendMessage({
       body: message,
@@ -55,8 +54,6 @@ export default function MessageArea(props) {
       updateMessageId(tempId, response.id);
     }
 
-    handleChats(msg)
-
     socket.emit("message", {
       roomId: roomId,
       message: { ...msg, id: response?.id || tempId },
@@ -64,10 +61,7 @@ export default function MessageArea(props) {
   };
 
   return (
-    <form
-      className="mt-auto bg-transparent p-4 flex"
-      onSubmit={handleSubmit} // Usar onSubmit en lugar de action
-    >
+    <form className="mt-auto bg-transparent p-4 flex" onSubmit={handleSubmit}>
       <input
         type="text"
         className="flex h-10 w-full mr-2 rounded-md border text-white border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none  focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-gray-800 border-none"

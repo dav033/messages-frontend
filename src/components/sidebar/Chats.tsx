@@ -6,7 +6,6 @@ import React from "react";
 import ChatItemSkeleton from "./ChatItemSkeleton";
 import { useUser } from "@/providers/UserContext";
 
-// Lazy load ChatItem outside the component to avoid redefining it on each render
 const ChatItem = React.lazy(() => import("./ChatItem"));
 
 interface ChatsProps {
@@ -15,7 +14,7 @@ interface ChatsProps {
 }
 
 const Chats: React.FC<ChatsProps> = ({ chatsData, user }: ChatsProps) => {
-  const { lastMessages } = useUser();
+  const { lastMessages, unreadedMessages } = useUser();
 
   const [chats, setChats] = useState([]);
 
@@ -39,8 +38,26 @@ const Chats: React.FC<ChatsProps> = ({ chatsData, user }: ChatsProps) => {
   }, [lastMessages]);
 
   useEffect(() => {
+    if (unreadedMessages.length > 0) {
+      setChats((prevChats) => {
+        const updatedChats = prevChats.map((chat) => {
+          const new_message = unreadedMessages.find(
+            (msg) => chat.id == msg.roomId
+          );
+
+          if (new_message) {
+            return { ...chat, unreaded_messages: new_message.messages };
+          }
+          return chat;
+        });
+
+        return updatedChats;
+      });
+    }
+  }, [unreadedMessages]);
+
+  useEffect(() => {
     if (chatsData) {
-      console.log("chatsData", chatsData);
       setChats([...chatsData]);
       const rooms = chatsData.map((chat: any) => chat.id.toString());
       socket.emit("joinRoom", rooms);

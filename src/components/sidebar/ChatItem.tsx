@@ -1,27 +1,57 @@
 "use client";
 
-import { Chat } from "@/icons/Chat.icon";
+import { Chat as ChatIcon } from "@/icons/Chat.icon";
 import { useUser } from "@/providers/UserContext";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
+import { Chat, Message } from "@/types";
+import { socket } from "@/socket";
+import { useParams } from "next/navigation";
 
 interface ChatItemProps {
-  chat: {
-    id: string;
-    name: string;
-    last_message: {
-      sender: string;
-      body: string;
-    } | null;
-  };
+  chat: Chat;
   userInformation: {
     id: string;
   };
 }
 
 const ChatItem: React.FC<ChatItemProps> = React.memo(
-  function ChatItem({ chat, userInformation }: ChatItemProps) {
-    const { user } = useUser();
+  function ChatItem({ chat }: ChatItemProps) {
+    const { user, handleChats, handleUnreadedMessages } = useUser();
+
+    const params = useParams();
+
+    useEffect(() => {
+      socket.on("messageData", (data) => {
+        const chatP = params.chat;
+
+        console.log(params);
+        console.log(chatP, data.receiver, chatP != data.receiver);
+        if (data.receiver != chat.id) {
+          return;
+        } else if (!chatP || chatP != data.receiver) {
+          handleUnreadedMessages(
+            chat.id,
+            user.id,
+            chat.unreaded_messages,
+            data
+          );
+        }
+
+        handleChats(data);
+      });
+
+      return () => {
+        socket.off("messageData");
+      };
+    }, [
+      chat.id,
+      chat.unreaded_messages,
+      handleChats,
+      handleUnreadedMessages,
+      params,
+      user.id,
+    ]);
 
     return (
       <Link
@@ -31,11 +61,11 @@ const ChatItem: React.FC<ChatItemProps> = React.memo(
         className="flex items-center p-3 hover:bg-gray-800 cursor-pointer w-full rounded"
       >
         <div className="w-9 h-9 rounded-full mr-1 bg-green-500 flex justify-center items-center">
-          <Chat className="text-xl" />
+          <ChatIcon className="text-xl" />
         </div>
         <div className="h-9 flex-col justify-center p-1">
           <h4 className="text-xs leading-none mb-1">{chat.name}</h4>
-          <h5 className="text-xs text-gray-400 bg-purple- leading-none">
+          <h5 className="text-xs text-gray-400 truncate max-w-36 leading-none">
             {chat.last_message
               ? chat.last_message.sender === user?.id
                 ? "you: " + chat.last_message.body
@@ -43,6 +73,10 @@ const ChatItem: React.FC<ChatItemProps> = React.memo(
               : ""}
           </h5>
         </div>
+
+        <span className="ml-auto mr-0 rounded-full bg-sky-500 py-1 px-2 text-xs">
+          {chat.unreaded_messages.length}
+        </span>
       </Link>
     );
   },
