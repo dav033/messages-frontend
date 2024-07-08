@@ -18,6 +18,10 @@ const config: Config = {
         "default-button-foreground": "#f5f5f5",
       },
     },
+
+    fontSize: {
+      xs: "0.7rem",
+    },
   },
   plugins: [],
 };
