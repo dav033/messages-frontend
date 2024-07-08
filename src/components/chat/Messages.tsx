@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import MessageArea from "@/components/chat/MessageArea";
-import { revalidate } from "@/app/actions";
+import Message from "./Message";
 
 export default function Messages(props) {
-  const { messagesData, chat } = props;
+  const { messagesData } = props;
 
   const messagesEndRef = useRef(null);
 
@@ -17,9 +16,26 @@ export default function Messages(props) {
 
   return (
     <div className="flex-1 text-white overflow-auto h-full">
-      {messagesData?.map((message) => (
-        <div key={message.id}>{message.body}</div>
-      ))}
+      {messagesData?.map((message) => {
+        //recuperar el manesaje anterior a este index
+        const previousMessage = messagesData[messagesData.indexOf(message) - 1];
+
+        let differentUser;
+
+        if (previousMessage) {
+          differentUser = previousMessage.sender !== message.sender;
+        } else {
+          differentUser = true;
+        }
+
+        return (
+          <Message
+            key={message.id}
+            {...message}
+            differentUser={differentUser}
+          />
+        );
+      })}
       <div ref={messagesEndRef} />
     </div>
   );
