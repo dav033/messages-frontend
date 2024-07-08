@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/sidebar/Sidebar";
 import { UserContextProvider, useUser } from "@/providers/UserContext";
+import { ChatBoxContextProvider } from "@/providers/ChatBoxContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -20,13 +21,15 @@ export default async function RootLayout({
       <body className="min-h-screen">
         <div className="flex">
           <UserContextProvider>
-            <Sidebar />
+            <ChatBoxContextProvider>
+              <Sidebar />
 
-            <div
-              className={`flex flex-col flex-grow w-screen md:w-full min-h-screen overflow-visible ${inter.className} bg-transparent`}
-            >
-              {children}
-            </div>
+              <div
+                className={`flex flex-col flex-grow w-screen md:w-full min-h-screen overflow-visible ${inter.className} bg-transparent`}
+              >
+                {children}
+              </div>
+            </ChatBoxContextProvider>
           </UserContextProvider>
         </div>
       </body>

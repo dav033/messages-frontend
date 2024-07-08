@@ -3,14 +3,8 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { socket } from "@/socket";
 import { getCookie, setCookie } from "@/helpers";
-import { Message } from "@/types";
 
 const userContext = createContext(null);
-
-interface UnreadedMessages {
-  roomId: string;
-  messages: Message[];
-}
 
 export function UserContextProvider({
   children,
@@ -18,65 +12,6 @@ export function UserContextProvider({
   children: React.ReactNode;
 }) {
   const [user, setUser] = useState(null);
-  const [lastMessages, setLastMessages] = useState([]);
-  const [unreadedMessages, setUnreadedMessages] = useState<UnreadedMessages[]>(
-    []
-  );
-
-  const handleUnreadedMessages = (
-    roomId,
-    userId,
-    initialUnread: Message[],
-    msg?: Message
-  ) => {
-    if (msg) {
-      setUnreadedMessages((prevData) => {
-        const roomIndex = prevData.findIndex((room) => room.roomId == roomId);
-  
-        if (roomIndex !== -1) {
-          // Crear una copia del array de mensajes y añadir el nuevo mensaje
-          const newMessages = [...prevData[roomIndex].messages, msg];
-          
-          // Crear una copia del objeto de la sala actualizada
-          const updatedRoom = {
-            ...prevData[roomIndex],
-            messages: newMessages,
-          };
-  
-          // Crear una copia del array de datos previos con la sala actualizada
-          return [
-            ...prevData.slice(0, roomIndex),
-            updatedRoom,
-            ...prevData.slice(roomIndex + 1),
-          ];
-        } else {
-          // Si la sala no existe, crear una nueva
-          return [
-            ...prevData,
-            { roomId: roomId, messages: [...initialUnread, msg] },
-          ];
-        }
-      });
-    }
-  };
-  
-
-  const handleChats = (message) => {
-    setLastMessages((prevData) => {
-      const newMessages = [...prevData];
-      const existingMessageIndex = newMessages.findIndex(
-        (msg) => msg.receiver === message.receiver
-      );
-
-      if (existingMessageIndex !== -1) {
-        newMessages.splice(existingMessageIndex, 1);
-      }
-
-      newMessages.unshift(message);
-
-      return newMessages;
-    });
-  };
 
   useEffect(() => {
     const fetchUserData = async (userId) => {
@@ -148,10 +83,6 @@ export function UserContextProvider({
       value={{
         user,
         setUser,
-        lastMessages,
-        handleChats,
-        unreadedMessages,
-        handleUnreadedMessages,
       }}
     >
       {children}
