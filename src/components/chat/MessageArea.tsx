@@ -6,11 +6,12 @@ import Button from "../Button";
 import { useUser } from "@/providers/UserContext";
 import { socket } from "@/socket";
 import { useEffect } from "react";
+import { useChatBox } from "@/providers/ChatBoxContext";
 
 export default function MessageArea(props) {
   const { roomId, handleMessages, updateMessageId } = props;
-  const { user, handleChats, handleUnreadedMessages } = useUser();
-
+  const { user } = useUser();
+  const { handleChats, handleUnreadedMessages } = useChatBox();
   useEffect(() => {
     socket.on("message", (data) => {
       if (data.receiver !== roomId) {
@@ -37,7 +38,9 @@ export default function MessageArea(props) {
       body: message,
       typeM: "text",
       sender: user.id.toString(),
+      sender_name: user.name,
       receiver: roomId,
+      datetime: new Date().toISOString().slice(0, 19).replace("T", " "),
     };
 
     handleMessages(msg);
@@ -47,6 +50,7 @@ export default function MessageArea(props) {
       body: message,
       typeM: "text",
       sender: user.id.toString(),
+      sender_name: user.name,
       receiver: roomId,
     });
 
