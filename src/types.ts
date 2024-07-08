@@ -3,7 +3,22 @@ export interface Message {
   body: string;
   typeM: string;
   sender: string;
+  sender_name: string;
+  receiver: string | number;
+  readed: number[];
+  datetime: string;
+}
+
+export interface MessageData {
+  id: string;
+  body: string;
+  typeM: string;
+  sender: string;
+  sender_name: string;
   receiver: string;
+  readed: number[];
+  datetime: string;
+  differentUser: boolean;
 }
 
 export interface Chat {
