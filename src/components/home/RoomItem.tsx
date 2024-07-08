@@ -3,7 +3,6 @@
 import { Chat } from "@/icons/Chat.icon";
 import Button from "../Button";
 import { joinRoom } from "@/petitions";
-import { revalidate } from "../../app/actions";
 import { useUser } from "@/providers/UserContext";
 
 interface Props {

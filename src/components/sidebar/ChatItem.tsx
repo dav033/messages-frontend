@@ -3,10 +3,12 @@
 import { Chat as ChatIcon } from "@/icons/Chat.icon";
 import { useUser } from "@/providers/UserContext";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { Chat, Message } from "@/types";
 import { socket } from "@/socket";
 import { useParams } from "next/navigation";
+import { useChatBox } from "@/providers/ChatBoxContext";
+import { setReadedMessages } from "@/petitions";
 
 interface ChatItemProps {
   chat: Chat;
@@ -16,46 +18,52 @@ interface ChatItemProps {
 }
 
 const ChatItem: React.FC<ChatItemProps> = React.memo(
-  function ChatItem({ chat }: ChatItemProps) {
-    const { user, handleChats, handleUnreadedMessages } = useUser();
-
+  function ChatItem({ chat, userInformation }) {
+    const { user } = useUser();
+    const { handleChats, handleUnreadedMessages } = useChatBox();
     const params = useParams();
 
-    useEffect(() => {
-      socket.on("messageData", (data) => {
+    const handleSocketMessage = useCallback(
+      async (data: Message) => {
         const chatP = params.chat;
 
-        console.log(params);
-        console.log(chatP, data.receiver, chatP != data.receiver);
         if (data.receiver != chat.id) {
           return;
-        } else if (!chatP || chatP != data.receiver) {
+        }
+
+        if (!chatP || chatP != data.receiver) {
           handleUnreadedMessages(
             chat.id,
             user.id,
             chat.unreaded_messages,
             data
           );
+        } else if (chatP === data.receiver && data.sender !== user.id) {
+          await setReadedMessages(chat.id, user.id);
         }
 
         handleChats(data);
-      });
+      },
+      [
+        chat.id,
+        chat.unreaded_messages,
+        handleChats,
+        handleUnreadedMessages,
+        params.chat,
+        user.id,
+      ]
+    );
+
+    useEffect(() => {
+      socket.on("messageData", handleSocketMessage);
 
       return () => {
-        socket.off("messageData");
+        socket.off("messageData", handleSocketMessage);
       };
-    }, [
-      chat.id,
-      chat.unreaded_messages,
-      handleChats,
-      handleUnreadedMessages,
-      params,
-      user.id,
-    ]);
+    }, [handleSocketMessage]);
 
     return (
       <Link
-        prefetch={true}
         as={`/chats/${chat?.id}`}
         href={`/chats/${chat?.id}`}
         className="flex items-center p-3 hover:bg-gray-800 cursor-pointer w-full rounded"
@@ -82,12 +90,12 @@ const ChatItem: React.FC<ChatItemProps> = React.memo(
   },
   (prevProps, nextProps) => {
     return (
-      prevProps.chat?.id === nextProps.chat.id &&
+      prevProps.chat.id === nextProps.chat.id &&
       prevProps.chat.name === nextProps.chat.name &&
       prevProps.chat.last_message?.sender ===
         nextProps.chat.last_message?.sender &&
       prevProps.chat.last_message?.body === nextProps.chat.last_message?.body &&
-      prevProps.userInformation?.id === nextProps.userInformation.id
+      prevProps.userInformation.id === nextProps.userInformation.id
     );
   }
 );

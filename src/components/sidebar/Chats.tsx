@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { socket } from "@/socket";
 import React from "react";
 import ChatItemSkeleton from "./ChatItemSkeleton";
-import { useUser } from "@/providers/UserContext";
+import { useChatBox } from "@/providers/ChatBoxContext";
 
 const ChatItem = React.lazy(() => import("./ChatItem"));
 
@@ -14,7 +14,9 @@ interface ChatsProps {
 }
 
 const Chats: React.FC<ChatsProps> = ({ chatsData, user }: ChatsProps) => {
-  const { lastMessages, unreadedMessages } = useUser();
+  const { lastMessages, unreadedMessages } = useChatBox();
+
+  const [loading, setLoading] = useState(true);
 
   const [chats, setChats] = useState([]);
 
@@ -61,8 +63,13 @@ const Chats: React.FC<ChatsProps> = ({ chatsData, user }: ChatsProps) => {
       setChats([...chatsData]);
       const rooms = chatsData.map((chat: any) => chat.id.toString());
       socket.emit("joinRoom", rooms);
+      setLoading(false);
+    } else {
+      setLoading(false);
     }
   }, [chatsData]);
+
+  if (!chats || loading) return <ChatItemSkeleton />;
 
   return (
     <Suspense fallback={<ChatItemSkeleton />}>
