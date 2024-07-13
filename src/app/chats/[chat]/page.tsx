@@ -5,11 +5,13 @@ import { useEffect, useState } from "react";
 import { getMessagesByChat, setReadedMessages } from "@/petitions";
 import MessageArea from "@/components/chat/MessageArea";
 import { useUser } from "@/providers/UserContext";
+import { useChatBox } from "@/providers/ChatBoxContext";
 
 export default function Chat({ params }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
+  const { handleUnreadedMessages } = useChatBox();
 
   useEffect(() => {
     const storedMessages = localStorage.getItem(`messages_${params.chat}`);
@@ -30,8 +32,8 @@ export default function Chat({ params }) {
 
   useEffect(() => {
     if (user) {
-      console.log("setReadedMessages");
-      const owo = setReadedMessages(params.chat, user.id);
+      handleUnreadedMessages(params.chat, user.id);
+      setReadedMessages(params.chat, user.id);
     }
   }, [user, params.chat]);
 
