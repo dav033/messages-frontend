@@ -8,7 +8,7 @@ export const setCookie = (name: string, value: any, days: number) => {
   document.cookie = name + "=" + (value || "") + expires + "; path=/";
 };
 
-export const getCookie = (name) => {
+export const getCookie = (name: string) => {
   const nameEQ = name + "=";
   const ca = document.cookie.split(";");
   for (let i = 0; i < ca.length; i++) {
@@ -19,15 +19,23 @@ export const getCookie = (name) => {
   return null;
 };
 
-export const parseData = (dateStr: string) => {
-  if (dateStr) {
-    const [datePart, timePart] = dateStr.split(" ");
-    const [year, month, day] = datePart.split("-");
-    const [hours, minutes] = timePart.split(":");
+export const parseData = (dateStr: string): { date: string; time: string } => {
+  const isoDate = dateStr.replace(" ", "T") + "Z";
+  const date = new Date(isoDate);
+  const options = {
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone.toString(),
+    hour: "numeric" as const,
+    minute: "2-digit" as const,
+    hour12: true,
+  };
 
-    const formattedDate = `${year}/${month}/${day}`;
-    const formattedTime = `${hours}:${minutes}`;
+  const time = date.toLocaleTimeString([], options);
+  const optionsDate = {
+    year: "numeric" as const,
+    month: "2-digit" as const,
+    day: "numeric" as const
+  };
+  const dateFormatted = date.toLocaleDateString([], optionsDate);
 
-    return { date: formattedDate, time: formattedTime };
-  } else return { date: "", time: "" };
+  return { date: dateFormatted, time };
 };
