@@ -17,7 +17,6 @@ export default function Messages(props) {
   return (
     <div className="flex-1 text-white overflow-auto h-full">
       {messagesData?.map((message) => {
-        //recuperar el manesaje anterior a este index
         const previousMessage = messagesData[messagesData.indexOf(message) - 1];
 
         let differentUser;

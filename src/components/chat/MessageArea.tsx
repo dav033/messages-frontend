@@ -11,7 +11,7 @@ import { useChatBox } from "@/providers/ChatBoxContext";
 export default function MessageArea(props) {
   const { roomId, handleMessages, updateMessageId } = props;
   const { user } = useUser();
-  const { handleChats, handleUnreadedMessages } = useChatBox();
+  const { handleChats } = useChatBox();
   useEffect(() => {
     socket.on("message", (data) => {
       if (data.receiver !== roomId) {
