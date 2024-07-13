@@ -73,6 +73,16 @@ async function setReadedMessages(roomId, userId) {
   );
 }
 
+async function getRooms() {
+  const res = await fetch("http://localhost:8080/rooms", {
+    method: "GET",
+    next: { tags: ["rooms"] },
+    cache: "no-cache",
+  });
+
+  return res.json();
+}
+
 export {
   setReadedMessages,
   joinRoom,
@@ -80,4 +90,5 @@ export {
   getData,
   getMessagesByChat,
   sendMessage,
+  getRooms,
 };

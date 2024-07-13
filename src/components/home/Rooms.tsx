@@ -1,6 +1,6 @@
 "use server";
 import RoomItem from "./RoomItem";
-import { getRooms } from "@/app/actions";
+import { getRooms } from "@/petitions";
 
 export default async function Rooms() {
   const data = await getRooms();
