@@ -31,7 +31,6 @@ export function ChatBoxContextProvider({
         const roomIndex = prevData.findIndex((room) => room.roomId == roomId);
 
         if (roomIndex !== -1) {
-          // Crear una copia del array de mensajes y añadir el nuevo mensaje
           const newMessages = [...prevData[roomIndex].messages, msg];
 
           const updatedRoom = {
@@ -50,6 +49,51 @@ export function ChatBoxContextProvider({
             { roomId: roomId, messages: [...initialUnread, msg] },
           ];
         }
+      });
+    } else if (initialUnread) {
+      setUnreadedMessages((prevData) => {
+        const roomIndex = prevData.findIndex((room) => room.roomId == roomId);
+
+        if (roomIndex !== -1) {
+          const newMessages = [
+            ...prevData[roomIndex].messages,
+            ...initialUnread,
+          ];
+
+          const updatedRoom = {
+            ...prevData[roomIndex],
+            messages: newMessages,
+          };
+
+          return [
+            ...prevData.slice(0, roomIndex),
+            updatedRoom,
+            ...prevData.slice(roomIndex + 1),
+          ];
+        } else {
+          return [
+            ...prevData,
+            { roomId: roomId, messages: [...initialUnread] },
+          ];
+        }
+      });
+    } else {
+      setUnreadedMessages((prevData) => {
+        const roomIndex = prevData.findIndex((room) => room.roomId == roomId);
+        if (roomIndex !== -1) {
+          const updatedRoom = {
+            ...prevData[roomIndex],
+            messages: [],
+          };
+
+          return [
+            ...prevData.slice(0, roomIndex),
+            updatedRoom,
+            ...prevData.slice(roomIndex + 1),
+          ];
+        }
+
+        return prevData;
       });
     }
   };
