@@ -7,7 +7,7 @@ interface ButtonProps {
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
   variant?: "filled" | "outlined" | "text";
-  color?: "accent";
+  color?: string;
 }
 
 export default function Button(props: ButtonProps) {
@@ -28,12 +28,12 @@ export default function Button(props: ButtonProps) {
     accent: "bg-accent text-accent-foreground hover:bg-accent/90",
   };
 
-  let buttonClasses = `inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2`;
+  let buttonClasses = `inline-flex items-center justify-center whitespace-nowrap rounded text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2`;
 
   if (variant === "filled") {
     buttonClasses += ` ${colorVariantsFilled[color]}`;
   } else if (variant === "outlined") {
-    buttonClasses += ` border border-${color}-500 text-${color}-500 hover:bg-${color}-100`;
+    buttonClasses += ` border border-${color} border-${color}-800 text-${color}-500 hover:bg-${color}-400`;
   } else if (variant === "text") {
     buttonClasses += ` text-${color}-500 hover:bg-${color}-100`;
   }
