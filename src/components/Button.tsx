@@ -16,10 +16,10 @@ export default function Button(props: ButtonProps) {
     onClick,
     className: customClassName,
     disabled,
-    type = "button", // Default type to "button" if not provided
-    variant = "text", // Default variant to "filled" if not provided
-    color = "default", // Default color to "default" if not provided
-    ...rest // Captura los props restantes
+    type = "button",
+    variant = "text",
+    color = "default",
+    ...rest
   } = props;
 
   const colorVariantsFilled = {
@@ -48,7 +48,7 @@ export default function Button(props: ButtonProps) {
       onClick={onClick}
       className={buttonClasses.trim()}
       disabled={disabled}
-      {...rest} // Propaga los props restantes
+      {...rest}
     >
       {children}
     </button>
