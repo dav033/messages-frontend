@@ -52,17 +52,12 @@ export function ChatBoxContextProvider({
       });
     } else if (initialUnread) {
       setUnreadedMessages((prevData) => {
-        const roomIndex = prevData.findIndex((room) => room.roomId == roomId);
+        const roomIndex = prevData.findIndex((room) => room.roomId === roomId);
 
         if (roomIndex !== -1) {
-          const newMessages = [
-            ...prevData[roomIndex].messages,
-            ...initialUnread,
-          ];
-
           const updatedRoom = {
             ...prevData[roomIndex],
-            messages: newMessages,
+            messages: [...initialUnread], // Update messages to be equal to initialUnread
           };
 
           return [

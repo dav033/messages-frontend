@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 import { socket } from "@/socket";
 import React from "react";
 import ChatItemSkeleton from "./ChatItemSkeleton";
@@ -20,61 +20,46 @@ const Chats = React.memo(({ chatsData, user }: ChatsProps) => {
   const [chats, setChats] = useState([]);
 
   useEffect(() => {
-    if (lastMessages) {
-      setChats((prevChats) => {
-        const updatedChats = prevChats.map((chat) => {
-          const new_message = lastMessages.find(
-            (msg) => chat.id == msg.receiver
-          );
-          if (new_message) {
-            return { ...chat, last_message: new_message };
-          }
-          return chat;
-        });
-
-        return updatedChats;
-      });
-    }
-  }, [lastMessages]);
-
-  useEffect(() => {
-    if (unreadedMessages.length > 0) {
-      setChats((prevChats) => {
-        const updatedChats = prevChats.map((chat) => {
-          const new_message = unreadedMessages.find(
-            (msg) => chat.id === msg.roomId
-          );
-          if (new_message) {
-            return { ...chat, unreaded_messages: new_message.messages };
-          }
-          return chat;
-        });
-        return updatedChats;
-      });
-    } else {
-      setChats((prevChats) => {
-        const updatedChats = prevChats.map((chat) => {
-          return { ...chat, unreaded_messages: [] };
-        });
-        return updatedChats;
-      });
-    }
-  }, [unreadedMessages]);
-
-  useEffect(() => {
-    if (chatsData) {
+    if (chatsData && user) {
       setChats([...chatsData]);
       const rooms = chatsData.map((chat: any) => chat.id.toString());
       socket.emit("joinRoom", rooms);
       setLoading(false);
 
-      chatsData.map((chat: any) => {
+      chatsData.forEach((chat: any) => {
         handleUnreadedMessages(chat.id, user.id, chat.unreaded_messages);
       });
     } else {
       setLoading(false);
     }
-  }, [chatsData]);
+  }, [chatsData, user]);
+
+  useEffect(() => {
+    if (lastMessages) {
+      setChats((prevChats) =>
+        prevChats.map((chat) => {
+          const new_message = lastMessages.find(
+            (msg) => chat.id == msg.receiver
+          );
+          return new_message ? { ...chat, last_message: new_message } : chat;
+        })
+      );
+    }
+  }, [lastMessages]);
+
+  useEffect(() => {
+    setChats((prevChats) =>
+      prevChats.map((chat) => {
+        const new_message = unreadedMessages.find(
+          (msg) => chat.id === msg.roomId
+        );
+        return {
+          ...chat,
+          unreaded_messages: new_message ? new_message.messages : [],
+        };
+      })
+    );
+  }, [unreadedMessages]);
 
   if (loading) return <ChatItemSkeleton />;
 
@@ -82,7 +67,7 @@ const Chats = React.memo(({ chatsData, user }: ChatsProps) => {
     <Suspense fallback={<ChatItemSkeleton />}>
       <div>
         {chats.map((chat: any) => (
-          <ChatItem key={chat?.id} chat={chat} userInformation={user} />
+          <ChatItem key={chat.id} chat={chat} userInformation={user} />
         ))}
       </div>
     </Suspense>
