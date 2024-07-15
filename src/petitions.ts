@@ -1,5 +1,6 @@
 import axios from "axios";
 import { revalidate } from "./app/actions";
+import { AuthResponse } from "./types";
 
 const joinRoom = async (room_id, user_id) => {
   try {
@@ -28,8 +29,8 @@ async function getUserById(userId) {
   return res.json();
 }
 
-async function getData(roomId) {
-  const res = await fetch(`http://localhost:8080/user_rooms/${roomId}`, {
+async function getData(user_id) {
+  const res = await fetch(`http://localhost:8080/user_rooms/${user_id}`, {
     method: "GET",
     next: { tags: ["chats"] },
   });
@@ -47,7 +48,6 @@ const getMessagesByChat = async (chat) => {
 
   const fin = performance.now();
   const tiempoTranscurrido = fin - inicio;
-  console.log("Tiempo transcurrido: " + tiempoTranscurrido / 1000);
 
   return res.json();
 };
@@ -77,7 +77,66 @@ async function getRooms() {
   const res = await fetch("http://localhost:8080/rooms", {
     method: "GET",
     next: { tags: ["rooms"] },
-    cache: "no-cache",
+  });
+
+  return res.json();
+}
+
+async function registerTemporal(): Promise<AuthResponse> {
+  const res = await fetch("http://localhost:4000/users/register_temporal", {
+    method: "POST",
+    next: { tags: ["user"] },
+  });
+
+  return res.json();
+}
+
+async function registerCurrentUser(
+  user_id: number,
+  username: string,
+  password: string
+): Promise<AuthResponse> {
+  const res = await fetch(
+    `http://localhost:4000/users/update_user_type/${user_id}`,
+
+    {
+      method: "PUT",
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+      next: { tags: ["user"] },
+    }
+  );
+
+  return res.json();
+}
+
+async function register(name: string, password: string): Promise<AuthResponse> {
+  const res = await fetch("http://localhost:4000/users/register", {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      password,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  return res.json();
+}
+
+async function login(name: string, password: string): Promise<AuthResponse> {
+  const res = await fetch("http://localhost:3004/users/login", {
+    method: "POST",
+    body: JSON.stringify({
+      name,
+      password,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   return res.json();
@@ -85,10 +144,14 @@ async function getRooms() {
 
 export {
   setReadedMessages,
+  register,
   joinRoom,
   getUserById,
+  login,
   getData,
   getMessagesByChat,
   sendMessage,
   getRooms,
+  registerTemporal,
+  registerCurrentUser,
 };

@@ -9,6 +9,14 @@ export interface Message {
   datetime: string;
 }
 
+export interface AuthResponse {
+  token: string;
+  id: number;
+  name: string;
+  profileImage: string;
+  temporal: boolean;
+}
+
 export interface MessageData {
   id: string;
   body: string;

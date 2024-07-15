@@ -3,6 +3,9 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { socket } from "@/socket";
 import { getCookie, setCookie } from "@/helpers";
+import { registerTemporal } from "@/petitions";
+import { AuthResponse } from "@/types";
+import { revalidate } from "@/app/actions";
 
 const userContext = createContext(null);
 
@@ -11,7 +14,14 @@ export function UserContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<AuthResponse>(null);
+
+  const initNewUser = (newUser: AuthResponse) => {
+    setUser(newUser);
+    setCookie("userId", newUser.id, 7);
+    revalidate("chats");
+    localStorage.setItem("userData", JSON.stringify(newUser));
+  };
 
   useEffect(() => {
     const fetchUserData = async (userId) => {
@@ -30,13 +40,10 @@ export function UserContextProvider({
 
     const registerTemporalUser = async () => {
       try {
-        const response = await axios.post(
-          "http://localhost:4000/users/register_temporal"
-        );
-        const userData = response.data;
-        setUser(userData);
-        setCookie("userId", userData.id, 7);
-        localStorage.setItem("userData", JSON.stringify(userData));
+        const response: AuthResponse = await registerTemporal();
+        setUser(response);
+        setCookie("userId", response.id, 7);
+        localStorage.setItem("userData", JSON.stringify(response));
       } catch (error) {
         console.error(error);
       }
@@ -83,6 +90,7 @@ export function UserContextProvider({
       value={{
         user,
         setUser,
+        initNewUser,
       }}
     >
       {children}
