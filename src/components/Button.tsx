@@ -50,7 +50,7 @@ export default function Button(props: ButtonProps) {
       disabled={disabled}
       {...rest}
     >
-      {children}
+      <span className="inline-flex items-center">{children}</span>
     </button>
   );
 }
