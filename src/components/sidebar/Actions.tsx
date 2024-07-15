@@ -11,6 +11,7 @@ import DialogTitle from "../Dialog/DialogTitle";
 import DialogDescription from "../Dialog/DialogDescription";
 import DialogFooter from "../Dialog/DialogFooter";
 import Button from "../Button";
+import AuthDialog from "./AuthDialog";
 
 export default function Actions() {
   const [open, setOpen] = useState(false);
@@ -19,31 +20,7 @@ export default function Actions() {
 
   return (
     <div>
-      <Dialog open={open} onClose={handleClose} className="text-black">
-        <DialogHeader>
-          <DialogTitle>Login to Access Content</DialogTitle>
-
-          <DialogDescription>
-            You need to log in or register to access the chat app.
-          </DialogDescription>
-
-          <div className="flex flex-col p-2">
-            <Button className="mb-2" variant="outlined" color="black">
-              Register whit current user
-            </Button>
-            <Button className="mb-2" variant="outlined" color="black">
-              Register
-            </Button>
-            <Button variant="outlined" color="black">
-              Login
-            </Button>
-          </div>
-
-          <DialogFooter className="justify-center">
-            <Button className="mx-auto" onClick={handleClose}> Cancel</Button>
-          </DialogFooter>
-        </DialogHeader>
-      </Dialog>
+      <AuthDialog open={open} handleClose={handleClose} />
       <ActionItem icon={Home} title="Home" to="/" />
       <ActionItem
         icon={Profile}
